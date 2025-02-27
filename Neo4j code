@@ -1,0 +1,26 @@
+LOAD CSV WITH HEADERS FROM 'file:///gene-data.csv' AS row
+RETURN row LIMIT 5;
+
+#Step 1: Create Disease and Gene Nodes
+
+// Create Disease nodes
+LOAD CSV WITH HEADERS FROM 'file:///gene-data.csv' AS row
+MERGE (d:Disease {name: row.Disease});
+
+// Create Gene nodes
+LOAD CSV WITH HEADERS FROM 'file:///gene-data.csv' AS row
+MERGE (g:Gene {id: row.`Gene ID`, name: row.`Gene Name`});
+
+#Step 2: Create Relationships
+
+LOAD CSV WITH HEADERS FROM 'file:///gene-data.csv' AS row
+MATCH (d:Disease {name: row.Disease})
+MATCH (g:Gene {id: row.`Gene ID`})
+MERGE (g)-[:ASSOCIATED_WITH]->(d);
+
+#Step 3: Query the Knowledge Graph
+
+MATCH (g:Gene)-[:ASSOCIATED_WITH]->(d:Disease)
+RETURN g, d LIMIT 10;
+
+#this would give the knowledge graph for a single disease
